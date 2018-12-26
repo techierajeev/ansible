@@ -1,0 +1,6 @@
+---
+[server]
+#10.3.100.218 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/Users/admin/Desktop/Downloads/DeCurtisDevKey.pem
+#54.152.235.96 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/Users/admin/Desktop/Downloads/DxpDemoShip.pem
+#54.89.197.95 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/Users/admin/Desktop/Downloads/DxpDemoShore.pem
+10.111.0.82 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/Users/shubham.mehta/Desktop/Downloads/DxpDemoShore.pem

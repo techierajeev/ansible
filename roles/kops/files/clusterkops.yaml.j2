@@ -1,0 +1,70 @@
+apiVersion: kops/v1alpha2
+kind: Cluster
+metadata:
+  creationTimestamp: 2017-09-23T06:56:39Z
+  name: {{ cluster_name }}
+spec:
+  kubeDNS:
+    provider: CoreDNS
+  api:
+    dns: {}
+    loadBalancer:
+      type: Internal
+  authorization:
+    rbac: {}
+  channel: stable
+  cloudProvider: aws
+  configBase: s3://{{ bucket_name }}/{{ cluster_name }}
+  etcdClusters:
+  - etcdMembers:
+    - instanceGroup: master-us-east-1a
+      name: a
+    - instanceGroup: master-us-east-1b
+      name: b
+    - instanceGroup: master-us-east-1c
+      name: c
+    name: main
+  - etcdMembers:
+    - instanceGroup: master-us-east-1a
+      name: a
+    - instanceGroup: master-us-east-1b
+      name: b
+    - instanceGroup: master-us-east-1c
+      name: c
+    name: events
+  iam:
+    legacy: false 
+  kubernetesApiAccess:
+  - 0.0.0.0/0
+  kubernetesVersion: 1.10.0
+  masterInternalName: api.internal.{{ cluster_name }}
+  masterPublicName: api.{{ cluster_name }}
+  networkCIDR: {{ network_cidr }}
+  networkID: {{ network_id }}
+  networking:
+    weave:
+      mtu: 8912
+  nonMasqueradeCIDR: 100.64.0.0/10
+  sshAccess:
+  - 0.0.0.0/0
+  subnets:
+  - cidr: {{ subnet_cidr_1a }}
+    id: {{ subnet_id_1a }}
+    name: us-east-1a
+    type: Private
+    zone: us-east-1a
+  - cidr: {{ subnet_cidr_1b }}
+    id: {{ subnet_id_1b }}
+    name: us-east-1b
+    type: Private
+    zone: us-east-1b
+  - cidr: {{ subnet_cidr_1c }}
+    id: {{ subnet_id_1c }}
+    name: us-east-1c
+    type: Private
+    zone: us-east-1c
+  topology:
+    dns:
+      type: Private
+    masters: private
+    nodes: private

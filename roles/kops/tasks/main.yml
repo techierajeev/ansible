@@ -1,0 +1,59 @@
+---
+# tasks file for kops
+
+- name: Install kops
+  get_url: 
+    url: https://github.com/kubernetes/kops/releases/download/1.10.0/kops-linux-amd64 
+    dest: /usr/local/bin/kops
+    mode: 0657
+
+- name: Install kubectl
+  get_url:
+    url: https://github.com/kubernetes/kops/releases/download/1.10.0/kops-linux-amd64
+    dest: /usr/local/bin/kubectl
+    mode: 0657
+
+#- name: Create Cluster of Kops
+#  shell: |
+#     export KOPS_STATE_STORE=s3://{{ bucket_name }}
+#     kops create cluster --cloud=aws --zones=us-east-1d --name={{ cluster_name }} --dns-zone={{ dns_zone }} --dns public
+ 
+- name: copy the templates
+  template: 
+    src: "/etc/ansible/roles/kops/files/{{ item }}.j2"
+    dest: /root/{{ item }}
+  with_items:
+    - clusterkops.yaml
+    - nodes.yaml
+    - master.yaml
+    - master1.yaml
+    - master2.yaml
+  become: true
+ 
+- name: Create Cluster of Kops
+  shell: |
+     export KOPS_STATE_STORE=s3://{{ bucket_name }}
+     kops create -f /root/clusterkops.yaml 
+     kops create -f /root/master.yaml
+     kops create -f /root/master1.yaml
+     kops create -f /root/master2.yaml
+     kops create -f /root/nodes.yaml
+     kops create secret --name vvprod.k8s.local sshpublickey admin -i ~/.ssh/id_rsa.pub
+     kops update cluster vvprod.k8s.local --yes
+  become: true
+  tags: kops
+
+#- name: copy dashboard
+#  copy: 
+#    src: /etc/ansible/roles/kops/files/kubernetes-dashboard.yaml
+#    dest: /tmp/kubernetes-dashboard.yaml
+#  tags: dashboard
+
+#- name: Create Spot Nodes
+#  shell: |
+#    export KUBECONFIG={{ KUBECONFIG_path }}
+#    kubectl create -f /tmp/kubernetes-dashboard.yaml
+#  become: true
+#  tags: dashboard
+
+  

@@ -1,0 +1,51 @@
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: 2017-09-23T06:56:39Z
+  labels:
+    kops.k8s.io/cluster: {{ cluster_name }}
+  name: spot_node
+spec:
+  additionalUserData:
+  - name: myscript.sh
+    type: text/x-shellscript
+    content: |
+      #!/bin/sh
+      mkdir -p /var/lib/es-data-integration /var/lib/es-data-dev /var/log/elasticsearch-integration /var/log/elasticsearch-dev
+      chmod -R 777 /var/lib/es-data-integration /var/lib/es-data-dev /var/log/elasticsearch-integration /var/log/elasticsearch-dev
+
+      PrivateIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
+      cat <<EOF > /etc/zabbix/zabbix_agentd.conf
+      PidFile=/var/run/zabbix/zabbix_agentd.pid
+      LogFile=/var/log/zabbix/zabbix_agentd.log
+      LogFileSize=10
+      Server={{ zabbix_server_ip }}
+      ServerActive={{ zabbix_server_ip }}
+      Hostname=K8S-Node-$PrivateIP
+      AllowRoot=1
+      Include=/etc/zabbix/zabbix_agentd.d/*.conf
+      EOF
+      service zabbix-agent restart
+      systemctl enable zabbix-agent
+  cloudLabels:
+    Name: D-AWS-VXP-KUBNS
+    application: vxp
+    application-role: application
+    cluster: kubernetes
+    environment: dev
+    location: shore
+    owner: decurtis
+    tech: kubernetes
+  image: {{ image_name }} 
+  machineType: {{ spot_machine_type }}
+  maxPrice: "{{ spot_price }}"
+  maxSize: {{ spot_max_size }}
+  minSize: {{ spot_min_size }}
+  rootVolumeSize: 250
+  rootVolumeType: gp2
+  nodeLabels:
+    kops.k8s.io/instancegroup: spot_node
+  role: Node
+  subnets:
+  - us-east-1a
+  - us-east-1b
