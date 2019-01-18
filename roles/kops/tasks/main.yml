@@ -21,7 +21,7 @@
 - name: copy the templates
   template: 
     src: "/etc/ansible/roles/kops/files/{{ item }}.j2"
-    dest: /root/{{ item }}
+    dest: /tmp/{{ item }}
   with_items:
     - clusterkops.yaml
     - nodes.yaml
@@ -33,11 +33,11 @@
 - name: Create Cluster of Kops
   shell: |
      export KOPS_STATE_STORE=s3://{{ bucket_name }}
-     kops create -f /root/clusterkops.yaml 
-     kops create -f /root/master.yaml
-     kops create -f /root/master1.yaml
-     kops create -f /root/master2.yaml
-     kops create -f /root/nodes.yaml
+     kops create -f /tmp/clusterkops.yaml 
+     kops create -f /tmp/master.yaml
+     kops create -f /tmp/master1.yaml
+     kops create -f /tmp/master2.yaml
+     kops create -f /tmp/nodes.yaml
      kops create secret --name vvprod.k8s.local sshpublickey admin -i ~/.ssh/id_rsa.pub
      kops update cluster vvprod.k8s.local --yes
   become: true
