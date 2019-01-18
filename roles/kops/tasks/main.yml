@@ -9,7 +9,7 @@
 
 - name: Install kubectl
   get_url:
-    url: https://github.com/kubernetes/kops/releases/download/1.10.0/kops-linux-amd64
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.10.0/bin/linux/amd64/kubectl
     dest: /usr/local/bin/kubectl
     mode: 0657
 
